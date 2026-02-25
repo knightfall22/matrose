@@ -1,0 +1,19 @@
+package task
+
+import "slices"
+
+var stateTransitionMap = map[State][]State{
+	Pending:   []State{Scheduled},
+	Scheduled: []State{Scheduled, Running, Failed},
+	Running:   []State{Running, Completed, Failed},
+	Completed: []State{},
+	Failed:    []State{},
+}
+
+func Contains(states []State, state State) bool {
+	return slices.Contains(states, state)
+}
+
+func ValidStateTransition(src State, dst State) bool {
+	return Contains(stateTransitionMap[src], dst)
+}

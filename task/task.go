@@ -39,6 +39,8 @@ type Task struct {
 	State State
 	Image string
 
+	ContainerID string
+
 	CPU float64
 
 	// Memory and Disk will help the system identify the number of resources a task needs.
@@ -126,6 +128,14 @@ type DockerResult struct {
 type Docker struct {
 	Client *client.Client
 	Config Config
+}
+
+func NewDocker(c *Config) *Docker {
+	dc, _ := client.NewClientWithOpts(client.FromEnv)
+	return &Docker{
+		Client: dc,
+		Config: *c,
+	}
 }
 
 func (d *Docker) Run() DockerResult {

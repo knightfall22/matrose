@@ -1,7 +1,10 @@
 package worker
 
 import (
+	"errors"
 	"fmt"
+	"log"
+	"time"
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/google/uuid"
@@ -28,19 +31,85 @@ type Worker struct {
 	TaskCount int
 }
 
+func (w *Worker) AddTask(t task.Task) {
+	w.Queue.Enqueue(t)
+}
+
 func (w *Worker) CollectStats() {
 	fmt.Println("I will collect stats")
 }
 
 // Responsible for run task. Keeps track of the task state and responds in kind.
-func (w *Worker) RunTask() {
-	fmt.Println("I will run a task")
+func (w *Worker) RunTask() task.DockerResult {
+	t := w.Queue.Dequeue()
+	if t == nil {
+		log.Println("No tasks in the queue")
+		return task.DockerResult{
+			Error:  nil,
+			Result: "queue empty",
+		}
+	}
+
+	taskQueued := t.(task.Task)
+
+	taskPersisted := w.Db[taskQueued.ID]
+	if taskPersisted == nil {
+		taskPersisted = &taskQueued
+		w.Db[taskQueued.ID] = taskPersisted
+	}
+
+	var result task.DockerResult
+	if task.ValidStateTransition(taskPersisted.State, taskQueued.State) {
+		switch taskQueued.State {
+		case task.Scheduled:
+			result = w.StartTask(taskQueued)
+		case task.Completed:
+			result = w.StopTask(taskQueued)
+		default:
+			result.Error = errors.New("We should not get here")
+		}
+	} else {
+		err := fmt.Errorf("Invalid transition from %v to %v",
+			taskPersisted.State, taskQueued.State)
+		result.Error = err
+	}
+
+	return result
 }
 
-func (w *Worker) StartTask() {
-	fmt.Println("I will start a task")
+func (w *Worker) StartTask(t task.Task) task.DockerResult {
+	t.StartTime = time.Now().UTC()
+	config := task.NewConfig(&t)
+	d := task.NewDocker(config)
+
+	res := d.Run()
+	if res.Error != nil {
+		log.Printf("Error stopping container %v: %v\n", t.ContainerID, res.Error)
+		t.State = task.Failed
+		w.Db[t.ID] = &t
+		return res
+	}
+
+	t.State = task.Running
+	t.FinishTime = time.Now()
+	w.Db[t.ID] = &t
+	return res
 }
 
-func (w *Worker) StopTask() {
-	fmt.Println("I will stop a task")
+func (w *Worker) StopTask(t task.Task) task.DockerResult {
+	config := task.NewConfig(&t)
+	d := task.NewDocker(config)
+
+	res := d.Stop(t.ContainerID)
+	if res.Error != nil {
+		log.Printf("Error stopping container %v: %v\n", t.ContainerID, res.Error)
+		return res
+	}
+
+	t.State = task.Completed
+	t.FinishTime = time.Now()
+	w.Db[t.ID] = &t
+
+	log.Printf("Stopped and removed container %v for task %v\n", t.ContainerID, t.ID)
+	return res
 }
