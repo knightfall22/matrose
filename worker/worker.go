@@ -28,6 +28,8 @@ type Worker struct {
 	//Keeps tracks of all tracks in a worker
 	Db map[uuid.UUID]*task.Task
 
+	Stats *Stats
+
 	TaskCount int
 }
 
@@ -36,7 +38,12 @@ func (w *Worker) AddTask(t task.Task) {
 }
 
 func (w *Worker) CollectStats() {
-	fmt.Println("I will collect stats")
+	for {
+		log.Println("Collecting Stats")
+		w.Stats = GetStats()
+		w.Stats.TaskCount = w.TaskCount
+		time.Sleep(15 * time.Second)
+	}
 }
 
 // Responsible for run task. Keeps track of the task state and responds in kind.

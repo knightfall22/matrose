@@ -17,6 +17,7 @@ func (a *Api) initRouter() {
 	a.Router.HandleFunc("POST /tasks", a.StartTaskHandler)
 	a.Router.HandleFunc("GET /tasks", a.GetTasksHandler)
 	a.Router.HandleFunc("DELETE /tasks/{id}", a.StopTaskHandler)
+	a.Router.HandleFunc("GET /stats", a.GetStatsHandler)
 }
 
 func (a *Api) StartServer() {
@@ -89,6 +90,12 @@ func (a *Api) StopTaskHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Added task %v to stop container %v\n", taskToStop.ID, taskToStop.ContainerID)
 	w.WriteHeader(http.StatusNoContent)
 	return
+}
+
+func (a *Api) GetStatsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(a.Worker.Stats)
 }
 
 type ErrResponse struct {
