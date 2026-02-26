@@ -34,36 +34,36 @@ const (
 )
 
 type Task struct {
-	ID    uuid.UUID
-	Name  string
-	State State
-	Image string
+	ID    uuid.UUID `json:"id"`
+	Name  string    `json:"name"`
+	State State     `json:"state"`
+	Image string    `json:"image"`
 
-	ContainerID string
+	ContainerID string `json:"container_id"`
 
-	CPU float64
+	CPU float64 `json:"cpu"`
 
 	// Memory and Disk will help the system identify the number of resources a task needs.
-	Memory int64
-	Disk   int64
+	Memory int64 `json:"memory"`
+	Disk   int64 `json:"disk"`
 
 	// `ExposedPorts` and `PortBindings` are used by
 	// Docker to ensure the machine allocates the proper network ports for
 	// the task and that it is available on the network.
-	ExposedPorts nat.PortSet
-	PortBindings map[string]string
+	ExposedPorts nat.PortSet       `json:"exposed_ports"`
+	PortBindings map[string]string `json:"port_bindings"`
 
-	RestartPolicy string
-	StartTime     time.Time
-	FinishTime    time.Time
+	RestartPolicy string    `json:"restart_policy"`
+	StartTime     time.Time `json:"start_time"`
+	FinishTime    time.Time `json:"finish_time"`
 }
 
 // Serves a state transition mechanism.
 type TaskEvent struct {
-	ID        uuid.UUID
-	State     State
-	Timestamp time.Time
-	Task      Task
+	ID        uuid.UUID `json:"id"`
+	State     State     `json:"state"`
+	Timestamp time.Time `json:"timestamp"`
+	Task      Task      `json:"task"`
 }
 
 func NewConfig(t *Task) *Config {
@@ -160,10 +160,9 @@ func (d *Docker) Run() DockerResult {
 	}
 
 	cc := container.Config{
-		Image: d.Config.Image,
-		Tty:   false,
-		Env:   d.Config.ENV,
-		//Debug: Watch for potential errors
+		Image:        d.Config.Image,
+		Tty:          false,
+		Env:          d.Config.ENV,
 		ExposedPorts: d.Config.ExposedPorts,
 	}
 

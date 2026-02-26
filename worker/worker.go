@@ -90,8 +90,9 @@ func (w *Worker) StartTask(t task.Task) task.DockerResult {
 		return res
 	}
 
+	t.ContainerID = res.ContainerID
 	t.State = task.Running
-	t.FinishTime = time.Now()
+	t.FinishTime = time.Now().UTC()
 	w.Db[t.ID] = &t
 	return res
 }
@@ -107,9 +108,22 @@ func (w *Worker) StopTask(t task.Task) task.DockerResult {
 	}
 
 	t.State = task.Completed
-	t.FinishTime = time.Now()
+	t.FinishTime = time.Now().UTC()
 	w.Db[t.ID] = &t
 
 	log.Printf("Stopped and removed container %v for task %v\n", t.ContainerID, t.ID)
 	return res
+}
+
+func (w *Worker) GetTasks() []*task.Task {
+	taskLen := len(w.Db)
+	tasks := make([]*task.Task, taskLen)
+
+	i := 0
+	for _, task := range w.Db {
+		tasks[i] = task
+		i++
+	}
+
+	return tasks
 }
