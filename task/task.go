@@ -130,6 +130,7 @@ type Docker struct {
 	Config Config
 }
 
+// Connects with docker from the environment
 func NewDocker(c *Config) *Docker {
 	dc, _ := client.NewClientWithOpts(client.FromEnv)
 	return &Docker{
