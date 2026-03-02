@@ -53,6 +53,11 @@ type Task struct {
 	ExposedPorts nat.PortSet       `json:"exposed_ports"`
 	PortBindings map[string]string `json:"port_bindings"`
 
+	HostPorts nat.PortMap `json:"host_ports"`
+
+	HealthCheck  string `json:"health_check"`
+	RestartCount int
+
 	RestartPolicy string    `json:"restart_policy"`
 	StartTime     time.Time `json:"start_time"`
 	FinishTime    time.Time `json:"finish_time"`
@@ -73,6 +78,7 @@ func NewConfig(t *Task) *Config {
 		Memory:        t.Memory,
 		Disk:          t.Disk,
 		ExposedPorts:  t.ExposedPorts,
+		PortBindings:  t.PortBindings,
 		Image:         t.Image,
 		RestartPolicy: t.RestartPolicy,
 	}
@@ -88,7 +94,9 @@ type Config struct {
 	AttachStderr bool
 
 	ExposedPorts nat.PortSet
-	Cmd          []string
+	PortBindings map[string]string
+
+	Cmd []string
 
 	//Holds the name of the image to run
 	Image string
@@ -124,6 +132,11 @@ type DockerResult struct {
 	Result      string
 }
 
+type DockerInspectResponse struct {
+	Error     error
+	Container *container.InspectResponse
+}
+
 // Encapsulates everything we need to run our task as a Docker container.
 type Docker struct {
 	Client *client.Client
@@ -137,6 +150,18 @@ func NewDocker(c *Config) *Docker {
 		Client: dc,
 		Config: *c,
 	}
+}
+
+func (d *Docker) Inspect(containerID string) DockerInspectResponse {
+	dc, _ := client.NewClientWithOpts(client.FromEnv)
+	ctx := context.Background()
+	resp, err := dc.ContainerInspect(ctx, containerID)
+	if err != nil {
+		log.Printf("Error inspecting container: %s\n", err)
+		return DockerInspectResponse{Error: err}
+	}
+
+	return DockerInspectResponse{Container: &resp}
 }
 
 func (d *Docker) Run() DockerResult {
@@ -167,9 +192,20 @@ func (d *Docker) Run() DockerResult {
 		ExposedPorts: d.Config.ExposedPorts,
 	}
 
+	portBindings := make(nat.PortMap)
+	for k, v := range d.Config.PortBindings {
+		portBindings[nat.Port(k)] = []nat.PortBinding{
+			{
+				HostIP:   "0.0.0.0", // Bind to all host interfaces
+				HostPort: v,
+			},
+		}
+	}
+
 	hc := container.HostConfig{
 		RestartPolicy: rp,
 		Resources:     r,
+		PortBindings:  portBindings,
 	}
 	resp, err := d.Client.ContainerCreate(
 		ctx,

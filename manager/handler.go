@@ -1,4 +1,4 @@
-package worker
+package manager
 
 import (
 	"encoding/json"
@@ -17,7 +17,6 @@ func (a *Api) initRouter() {
 	a.Router.HandleFunc("POST /tasks", a.StartTaskHandler)
 	a.Router.HandleFunc("GET /tasks", a.GetTasksHandler)
 	a.Router.HandleFunc("DELETE /tasks/{id}", a.StopTaskHandler)
-	a.Router.HandleFunc("GET /stats", a.GetStatsHandler)
 }
 
 func (a *Api) StartServer() {
@@ -44,17 +43,10 @@ func (a *Api) StartTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.Worker.AddTask(te.Task)
+	a.Manager.AddTask(te)
 	log.Printf("Added task %v\n", te.Task.ID)
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(201)
 	json.NewEncoder(w).Encode(te.Task)
-}
-
-func (a *Api) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	json.NewEncoder(w).Encode(a.Worker.GetTasks())
 }
 
 func (a *Api) StopTaskHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +66,7 @@ func (a *Api) StopTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	taskToStop, ok := a.Worker.Db[taskId]
+	taskToStop, ok := a.Manager.TaskDb[taskId]
 	if !ok {
 		msg := fmt.Sprintf("No task with ID %v found", taskId)
 		log.Printf(msg)
@@ -82,20 +74,27 @@ func (a *Api) StopTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	newTaskEvent := task.TaskEvent{
+		ID:        uuid.New(),
+		State:     task.Completed,
+		Timestamp: time.Now().UTC(),
+	}
+
 	taskCopy := *taskToStop
 	taskCopy.State = task.Completed
 	taskCopy.FinishTime = time.Now().UTC()
+	newTaskEvent.Task = taskCopy
 
-	a.Worker.AddTask(taskCopy)
+	a.Manager.AddTask(newTaskEvent)
 	log.Printf("Added task %v to stop container %v\n", taskToStop.ID, taskToStop.ContainerID)
 	w.WriteHeader(http.StatusNoContent)
 	return
 }
 
-func (a *Api) GetStatsHandler(w http.ResponseWriter, r *http.Request) {
+func (a *Api) GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(a.Worker.Stats)
+	json.NewEncoder(w).Encode(a.Manager.GetTasks())
 }
 
 type ErrResponse struct {

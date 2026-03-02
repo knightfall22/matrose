@@ -1,0 +1,180 @@
+Starting Cube worker
+2026/03/02 15:45:20 server started on: localhost:5555
+2026/03/02 15:45:20 Collecting Stats
+2026/03/02 15:45:20 Checking status of tasks
+2026/03/02 15:45:20 Task updates completed
+2026/03/02 15:45:20 Sleeping for 15 seconds
+2026/03/02 15:45:20 No tasks to process currently.
+2026/03/02 15:45:20 Sleeping for 10 seconds.
+workers [localhost:5555]
+2026/03/02 15:45:25 server started on: localhost:5556
+2026/03/02 15:45:25 Processing any tasks in the queue
+2026/03/02 15:45:25 Queue is empty
+2026/03/02 15:45:25 Sleeping for 10 seconds
+2026/03/02 15:45:25 Performing task health check
+2026/03/02 15:45:25 Task health checks completed
+2026/03/02 15:45:25 Sleeping for 60 seconds
+2026/03/02 15:45:25 Checking for task updates from workers
+2026/03/02 15:45:25 Checking worker localhost:5555 for task updates
+2026/03/02 15:45:25 Task updates completed
+2026/03/02 15:45:25 Sleeping for 15 seconds
+2026/03/02 15:45:27 Added task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:45:32 No tasks to process currently.
+2026/03/02 15:45:32 Sleeping for 10 seconds.
+2026/03/02 15:45:37 Collecting Stats
+2026/03/02 15:45:37 Checking status of tasks
+2026/03/02 15:45:37 Task updates completed
+2026/03/02 15:45:37 Sleeping for 15 seconds
+2026/03/02 15:45:37 Processing any tasks in the queue
+2026/03/02 15:45:37 Added task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:45:37 task.Task{ID:uuid.UUID{0x96, 0x5a, 0x5, 0x4d, 0x1a, 0x38, 0x47, 0xb, 0xb7, 0xf6, 0xd7, 0x5a, 0xa8, 0xfd, 0x31, 0xdb}, Name:"test-chapter-9.2", State:1, Image:"timboring/echo-server:latest", ContainerID:"", CPU:0, Memory:0, Disk:0, ExposedPorts:nat.PortSet{"7777/tcp":struct {}{}}, PortBindings:map[string]string{"7777/tcp":"7778"}, HostPorts:nat.PortMap(nil), HealthCheck:"/healthfail", RestartCount:0, RestartPolicy:"", StartTime:time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), FinishTime:time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)}
+2026/03/02 15:45:37 Sleeping for 10 seconds
+2026/03/02 15:45:42 Checking for task updates from workers
+2026/03/02 15:45:42 Checking worker localhost:5555 for task updates
+Found task in queue: {965a054d-1a38-470b-b7f6-d75aa8fd31db test-chapter-9.2 1 timboring/echo-server:latest  0 0 0 map[7777/tcp:{}] map[7777/tcp:7778] map[] /healthfail 0  0001-01-01 00:00:00 +0000 UTC 0001-01-01 00:00:00 +0000 UTC}:
+2026/03/02 15:45:42 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:45:42 Task updates completed
+2026/03/02 15:45:42 Sleeping for 15 seconds
+2026/03/02 15:45:47 Processing any tasks in the queue
+2026/03/02 15:45:47 Queue is empty
+2026/03/02 15:45:47 Sleeping for 10 seconds
+{"status":"Pulling from timboring/echo-server","id":"latest"}
+{"status":"Digest: sha256:f2c5d20af1607b0c66e207aea1993365516707095d5bf34e17b5d1212a36d9df"}
+{"status":"Status: Image is up to date for timboring/echo-server:latest"}
+2026/03/02 13:45:47 Listening on http://localhost:7777
+2026/03/02 15:45:47 Sleeping for 10 seconds.
+2026/03/02 15:45:52 Collecting Stats
+2026/03/02 15:45:52 Checking status of tasks
+2026/03/02 15:45:52 Task updates completed
+2026/03/02 15:45:52 Sleeping for 15 seconds
+2026/03/02 15:45:57 Processing any tasks in the queue
+2026/03/02 15:45:57 Queue is empty
+2026/03/02 15:45:57 Sleeping for 10 seconds
+2026/03/02 15:45:57 Checking for task updates from workers
+2026/03/02 15:45:57 Checking worker localhost:5555 for task updates
+2026/03/02 15:45:57 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:45:57 Task updates completed
+2026/03/02 15:45:57 Sleeping for 15 seconds
+2026/03/02 15:45:57 No tasks to process currently.
+2026/03/02 15:45:57 Sleeping for 10 seconds.
+2026/03/02 15:46:08 Checking status of tasks
+2026/03/02 15:46:08 Collecting Stats
+2026/03/02 15:46:08 Processing any tasks in the queue
+2026/03/02 15:46:08 Queue is empty
+2026/03/02 15:46:08 Sleeping for 10 seconds
+2026/03/02 15:46:08 Task updates completed
+2026/03/02 15:46:08 Sleeping for 15 seconds
+2026/03/02 15:46:09 No tasks to process currently.
+2026/03/02 15:46:09 Sleeping for 10 seconds.
+2026/03/02 15:46:13 Checking for task updates from workers
+2026/03/02 15:46:13 Checking worker localhost:5555 for task updates
+2026/03/02 15:46:13 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:46:13 Task updates completed
+2026/03/02 15:46:13 Sleeping for 15 seconds
+2026/03/02 15:46:18 Processing any tasks in the queue
+2026/03/02 15:46:18 Queue is empty
+2026/03/02 15:46:18 Sleeping for 10 seconds
+2026/03/02 15:46:19 No tasks to process currently.
+2026/03/02 15:46:19 Sleeping for 10 seconds.
+2026/03/02 15:46:23 Collecting Stats
+2026/03/02 15:46:23 Checking status of tasks
+2026/03/02 15:46:23 Task updates completed
+2026/03/02 15:46:23 Sleeping for 15 seconds
+2026/03/02 15:46:28 Performing task health check
+2026/03/02 15:46:28 Calling health check for task 965a054d-1a38-470b-b7f6-d75aa8fd31db: /healthfail
+2026/03/02 15:46:28 Calling health check for task 965a054d-1a38-470b-b7f6-d75aa8fd31db: http://localhost:7778/healthfail
+2026/03/02 15:46:28 Error health check for task 965a054d-1a38-470b-b7f6-d75aa8fd31db did not return 200
+
+2026/03/02 15:46:28 Added task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:46:28 Response error (0): 
+2026/03/02 15:46:28 Task health checks completed
+2026/03/02 15:46:28 Sleeping for 60 seconds
+2026/03/02 15:46:28 Checking for task updates from workers
+2026/03/02 15:46:28 Checking worker localhost:5555 for task updates
+2026/03/02 15:46:28 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:46:28 Task updates completed
+2026/03/02 15:46:28 Sleeping for 15 seconds
+2026/03/02 15:46:28 Processing any tasks in the queue
+2026/03/02 15:46:28 Queue is empty
+2026/03/02 15:46:28 Sleeping for 10 seconds
+Found task in queue: {965a054d-1a38-470b-b7f6-d75aa8fd31db test-chapter-9.2 1 timboring/echo-server:latest 78b88e0ddafb0f2fe9fa44eef537f96257b28d114dd151c02fa7f7f255315613 0 0 0 map[7777/tcp:{}] map[7777/tcp:7778] map[7777/tcp:[{0.0.0.0 7778}]] /healthfail 1  2026-03-02 13:45:42.267515068 +0000 UTC 2026-03-02 13:45:47.724765994 +0000 UTC}:
+2026/03/02 15:46:29 Error running task: Invalid transition from 2 to 1
+2026/03/02 15:46:29 Sleeping for 10 seconds.
+2026/03/02 15:46:40 Processing any tasks in the queue
+2026/03/02 15:46:40 Queue is empty
+2026/03/02 15:46:40 Sleeping for 10 seconds
+2026/03/02 15:46:40 Collecting Stats
+2026/03/02 15:46:40 Checking status of tasks
+2026/03/02 15:46:40 Container for task 965a054d-1a38-470b-b7f6-d75aa8fd31db in non-running state exited
+2026/03/02 15:46:40 Task updates completed
+2026/03/02 15:46:40 Sleeping for 15 seconds
+2026/03/02 15:46:40 No tasks to process currently.
+2026/03/02 15:46:40 Sleeping for 10 seconds.
+2026/03/02 15:46:45 Checking for task updates from workers
+2026/03/02 15:46:45 Checking worker localhost:5555 for task updates
+2026/03/02 15:46:45 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:46:45 Task updates completed
+2026/03/02 15:46:45 Sleeping for 15 seconds
+2026/03/02 15:46:50 Processing any tasks in the queue
+2026/03/02 15:46:50 Queue is empty
+2026/03/02 15:46:50 Sleeping for 10 seconds
+2026/03/02 15:46:50 No tasks to process currently.
+2026/03/02 15:46:50 Sleeping for 10 seconds.
+2026/03/02 15:46:55 Collecting Stats
+2026/03/02 15:46:55 Checking status of tasks
+2026/03/02 15:46:55 Task updates completed
+2026/03/02 15:46:55 Sleeping for 15 seconds
+2026/03/02 15:47:00 Checking for task updates from workers
+2026/03/02 15:47:00 Checking worker localhost:5555 for task updates
+2026/03/02 15:47:00 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:47:00 Task updates completed
+2026/03/02 15:47:00 Sleeping for 15 seconds
+2026/03/02 15:47:00 Processing any tasks in the queue
+2026/03/02 15:47:00 Queue is empty
+2026/03/02 15:47:00 Sleeping for 10 seconds
+2026/03/02 15:47:00 No tasks to process currently.
+2026/03/02 15:47:00 Sleeping for 10 seconds.
+2026/03/02 15:47:11 Processing any tasks in the queue
+2026/03/02 15:47:11 Queue is empty
+2026/03/02 15:47:11 Sleeping for 10 seconds
+2026/03/02 15:47:11 Collecting Stats
+2026/03/02 15:47:11 Checking status of tasks
+2026/03/02 15:47:11 Task updates completed
+2026/03/02 15:47:11 Sleeping for 15 seconds
+2026/03/02 15:47:12 No tasks to process currently.
+2026/03/02 15:47:12 Sleeping for 10 seconds.
+2026/03/02 15:47:16 Checking for task updates from workers
+2026/03/02 15:47:16 Checking worker localhost:5555 for task updates
+2026/03/02 15:47:16 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:47:16 Task updates completed
+2026/03/02 15:47:16 Sleeping for 15 seconds
+2026/03/02 15:47:21 Processing any tasks in the queue
+2026/03/02 15:47:21 Queue is empty
+2026/03/02 15:47:21 Sleeping for 10 seconds
+2026/03/02 15:47:22 No tasks to process currently.
+2026/03/02 15:47:22 Sleeping for 10 seconds.
+2026/03/02 15:47:26 Collecting Stats
+2026/03/02 15:47:26 Checking status of tasks
+2026/03/02 15:47:26 Task updates completed
+2026/03/02 15:47:26 Sleeping for 15 seconds
+2026/03/02 15:47:31 Performing task health check
+2026/03/02 15:47:31 Added task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:47:31 Response error (0): 
+2026/03/02 15:47:31 Task health checks completed
+2026/03/02 15:47:31 Sleeping for 60 seconds
+2026/03/02 15:47:31 Checking for task updates from workers
+2026/03/02 15:47:31 Checking worker localhost:5555 for task updates
+2026/03/02 15:47:31 Attempting to update task 965a054d-1a38-470b-b7f6-d75aa8fd31db
+2026/03/02 15:47:31 Task updates completed
+2026/03/02 15:47:31 Sleeping for 15 seconds
+2026/03/02 15:47:31 Processing any tasks in the queue
+2026/03/02 15:47:31 Queue is empty
+2026/03/02 15:47:31 Sleeping for 10 seconds
+Found task in queue: {965a054d-1a38-470b-b7f6-d75aa8fd31db test-chapter-9.2 1 timboring/echo-server:latest 78b88e0ddafb0f2fe9fa44eef537f96257b28d114dd151c02fa7f7f255315613 0 0 0 map[7777/tcp:{}] map[7777/tcp:7778] map[] /healthfail 2  2026-03-02 13:45:42.267515068 +0000 UTC 2026-03-02 13:45:47.724765994 +0000 UTC}:
+{"status":"Pulling from timboring/echo-server","id":"latest"}
+{"status":"Digest: sha256:f2c5d20af1607b0c66e207aea1993365516707095d5bf34e17b5d1212a36d9df"}
+{"status":"Status: Image is up to date for timboring/echo-server:latest"}
+2026/03/02 15:47:36 Error creating container using image timboring/echo-server:latest: Error response from daemon: Conflict. The container name "/test-chapter-9.2" is already in use by container "78b88e0ddafb0f2fe9fa44eef537f96257b28d114dd151c02fa7f7f255315613". You have to remove (or rename) that container to be able to reuse that name.
+2026/03/02 15:47:36 Error stopping container 78b88e0ddafb0f2fe9fa44eef537f96257b28d114dd151c02fa7f7f255315613: Error response from daemon: Conflict. The container name "/test-chapter-9.2" is already in use by container "78b88e0ddafb0f2fe9fa44eef537f96257b28d114dd151c02fa7f7f255315613". You have to remove (or rename) that container to be able to reuse that name.
+2026/03/02 15:47:36 Error running task: Error response from daemon: Conflict. The container name "/test-chapter-9.2" is already in use by container "78b88e0ddafb0f2fe9fa44eef537f96257b28d114dd151c02fa7f7f255315613". You have to remove (or rename) that container to be able to reuse that name.
+2026/03/02 15:47:36 Sleeping for 10 seconds.

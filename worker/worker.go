@@ -47,7 +47,7 @@ func (w *Worker) CollectStats() {
 }
 
 // Responsible for run task. Keeps track of the task state and responds in kind.
-func (w *Worker) RunTask() task.DockerResult {
+func (w *Worker) runTask() task.DockerResult {
 	t := w.Queue.Dequeue()
 	if t == nil {
 		log.Println("No tasks in the queue")
@@ -58,11 +58,12 @@ func (w *Worker) RunTask() task.DockerResult {
 	}
 
 	taskQueued := t.(task.Task)
+	fmt.Printf("Found task in queue: %v:\n", taskQueued)
 
 	taskPersisted := w.Db[taskQueued.ID]
 	if taskPersisted == nil {
 		taskPersisted = &taskQueued
-		w.Db[taskQueued.ID] = taskPersisted
+		w.Db[taskQueued.ID] = &taskQueued
 	}
 
 	var result task.DockerResult
@@ -82,6 +83,22 @@ func (w *Worker) RunTask() task.DockerResult {
 	}
 
 	return result
+}
+
+func (w *Worker) RunTask() task.DockerResult {
+	for {
+		if w.Queue.Len() != 0 {
+			res := w.runTask()
+			if res.Error != nil {
+				log.Printf("Error running task: %v\n", res.Error)
+			}
+		} else {
+			log.Printf("No tasks to process currently.\n")
+		}
+
+		log.Println("Sleeping for 10 seconds.")
+		time.Sleep(10 * time.Second)
+	}
 }
 
 func (w *Worker) StartTask(t task.Task) task.DockerResult {
@@ -133,4 +150,45 @@ func (w *Worker) GetTasks() []*task.Task {
 	}
 
 	return tasks
+}
+
+func (w *Worker) InspectTask(t *task.Task) task.DockerInspectResponse {
+	config := task.NewConfig(t)
+	d := task.NewDocker(config)
+
+	return d.Inspect(t.ContainerID)
+}
+
+func (w *Worker) updateTasks() {
+	for id, t := range w.Db {
+		if t.State == task.Running {
+			resp := w.InspectTask(t)
+			if resp.Error != nil {
+				fmt.Printf("ERROR: %v\n", resp.Error)
+			}
+
+			if resp.Container == nil {
+				log.Printf("No container for running task %s\n", id)
+				t.State = task.Failed
+			}
+
+			if resp.Container.State.Status == "exited" {
+				log.Printf("Container for task %s in non-running state %s",
+					id, resp.Container.State.Status)
+				t.State = task.Failed
+			}
+
+			w.Db[id].HostPorts = resp.Container.NetworkSettings.NetworkSettingsBase.Ports
+		}
+	}
+}
+
+func (w *Worker) UpdateTasks() {
+	for {
+		log.Println("Checking status of tasks")
+		w.updateTasks()
+		log.Println("Task updates completed")
+		log.Println("Sleeping for 15 seconds")
+		time.Sleep(15 * time.Second)
+	}
 }
