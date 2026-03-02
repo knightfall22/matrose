@@ -5,7 +5,7 @@ import "slices"
 var stateTransitionMap = map[State][]State{
 	Pending:   []State{Scheduled},
 	Scheduled: []State{Scheduled, Running, Failed},
-	Running:   []State{Running, Completed, Failed},
+	Running:   []State{Running, Completed, Failed, Scheduled},
 	Completed: []State{},
 	Failed:    []State{Scheduled},
 }
