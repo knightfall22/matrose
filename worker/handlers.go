@@ -74,14 +74,19 @@ func (a *Api) StopTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	taskToStop, ok := a.Worker.Db[taskId]
-	if !ok {
+	res, err := a.Worker.Db.Get(taskId.String())
+	if err != nil {
 		msg := fmt.Sprintf("No task with ID %v found", taskId)
 		log.Printf(msg)
 		writeError(w, http.StatusNotFound, msg)
 		return
 	}
 
+	taskToStop, ok := res.(*task.Task)
+	if !ok {
+		log.Printf("cannot convert result %v to task.Task type\n", taskToStop)
+		return
+	}
 	taskCopy := *taskToStop
 	taskCopy.State = task.Completed
 	taskCopy.FinishTime = time.Now().UTC()

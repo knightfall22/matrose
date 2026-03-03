@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
 
-	"github.com/golang-collections/collections/queue"
-	"github.com/google/uuid"
 	"github.com/knightfall22/matrose/manager"
-	"github.com/knightfall22/matrose/task"
 	"github.com/knightfall22/matrose/worker"
 )
 
@@ -22,9 +20,19 @@ func main() {
 
 	fmt.Println("Starting Cube worker")
 
-	w1 := &worker.Worker{
-		Queue: *queue.New(),
-		Db:    make(map[uuid.UUID]*task.Task),
+	w1, err := worker.New("worker-1", "persisted")
+	if err != nil {
+		log.Println("worker 1 failed to start %v\n", err)
+	}
+
+	w2, err := worker.New("worker-2", "persisted")
+	if err != nil {
+		log.Println("worker 2 failed to start %v\n", err)
+	}
+
+	w3, err := worker.New("worker-3", "persisted")
+	if err != nil {
+		log.Println("worker 3 failed to start %v\n", err)
 	}
 
 	wapi1 := worker.Api{
@@ -33,20 +41,10 @@ func main() {
 		Worker:  w1,
 	}
 
-	w2 := &worker.Worker{
-		Queue: *queue.New(),
-		Db:    make(map[uuid.UUID]*task.Task),
-	}
-
 	wapi2 := worker.Api{
 		Address: whost,
 		Port:    mport + 1,
 		Worker:  w2,
-	}
-
-	w3 := &worker.Worker{
-		Queue: *queue.New(),
-		Db:    make(map[uuid.UUID]*task.Task),
 	}
 
 	wapi3 := worker.Api{
@@ -78,7 +76,10 @@ func main() {
 		fmt.Sprintf("%s:%d", whost, mport+1),
 		fmt.Sprintf("%s:%d", whost, mport+2),
 	}
-	m := manager.New(workers, "evpm")
+	m, err := manager.New(workers, "evpm", "persisted")
+	if err != nil {
+		log.Panicf("error creating manager: %v\n", err)
+	}
 	mapi := manager.Api{
 		Address: mhost,
 		Port:    mport,
