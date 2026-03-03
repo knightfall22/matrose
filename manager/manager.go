@@ -13,6 +13,8 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/golang-collections/collections/queue"
 	"github.com/google/uuid"
+	"github.com/knightfall22/matrose/node"
+	"github.com/knightfall22/matrose/scheduler"
 	"github.com/knightfall22/matrose/task"
 	"github.com/knightfall22/matrose/worker"
 )
@@ -34,22 +36,42 @@ type Manager struct {
 	WorkerTaskMap map[string][]uuid.UUID
 	TaskWorkerMap map[uuid.UUID]string
 
+	WorkerNodes []*node.Node
+	Scheduler   scheduler.Scheduler
+
 	lastWorker int
 }
 
-func New(workers []string) *Manager {
+func New(workers []string, schedulerType string) *Manager {
 	workerTaskMap := make(map[string][]uuid.UUID)
+
+	var nodes []*node.Node
 	for worker := range workers {
 		workerTaskMap[workers[worker]] = []uuid.UUID{}
+
+		nAPI := fmt.Sprintf("http://%v", workers[worker])
+		n := node.NewNode(workers[worker], nAPI, "worker")
+		nodes = append(nodes, n)
 	}
 
-	fmt.Println("workers", workers)
+	var s scheduler.Scheduler
+	switch schedulerType {
+	case "roundrobin":
+		s = &scheduler.RoundRobin{Name: "roundrobin"}
+	case "evpm":
+		s = &scheduler.Epvm{Name: "evpm"}
+	default:
+		s = &scheduler.RoundRobin{Name: "roundrobin"}
+	}
+
 	return &Manager{
 		Pending:       *queue.New(),
 		TaskDb:        make(map[uuid.UUID]*task.Task),
 		EventDb:       make(map[uuid.UUID]*task.TaskEvent),
 		Workers:       workers,
 		WorkerTaskMap: workerTaskMap,
+		Scheduler:     s,
+		WorkerNodes:   nodes,
 		TaskWorkerMap: make(map[uuid.UUID]string),
 	}
 }
@@ -61,16 +83,18 @@ func (m *Manager) AddTask(te task.TaskEvent) {
 // This method is responsible for looking at the requirements specified
 // in a Task and evaluating the resources available in the pool of
 // workers to see which worker is best suited to run the task.
-func (m *Manager) SelectWorker() string {
-	newWorker := 0
-	if m.lastWorker+1 < len(m.Workers) {
-		newWorker = m.lastWorker + 1
-		m.lastWorker++
-	} else {
-		m.lastWorker = 0
+func (m *Manager) SelectWorker(t task.Task) (*node.Node, error) {
+	candidates := m.Scheduler.SelectCandidateNodes(t, m.WorkerNodes)
+
+	if candidates == nil {
+		msg := fmt.Sprintf("No available candidates match resource request for task %v", t.ID)
+		err := errors.New(msg)
+		return nil, err
 	}
 
-	return m.Workers[newWorker]
+	scores := m.Scheduler.Score(t, m.WorkerNodes)
+	pick := m.Scheduler.Pick(scores, m.WorkerNodes)
+	return pick, nil
 }
 
 func (m *Manager) updateTasks() {
@@ -135,20 +159,65 @@ func (m *Manager) ProcessTasks() {
 	}
 }
 
+func (m *Manager) stopTask(worker string, taskID string) {
+	client := &http.Client{}
+	url := fmt.Sprintf("http://%s/tasks/%s", worker, taskID)
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		log.Printf("error creating request to delete task %s: %v\n", taskID, err)
+		return
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("error connecting to worker at %s: %v\n", url, err)
+		return
+	}
+
+	if resp.StatusCode != 204 {
+		log.Printf("Error sending request: %v\n", err)
+		return
+	}
+
+	log.Printf("task %s has been scheduled to be stopped", taskID)
+}
+
 // Todo: add proper error handling
 func (m *Manager) SendWork() {
 	if m.Pending.Len() > 0 {
-		sWorker := m.SelectWorker()
 
 		event := m.Pending.Dequeue()
 
 		taskEvent := event.(task.TaskEvent)
+
 		sTask := taskEvent.Task
 
 		//Add task and task event to appropriate stores
 		m.EventDb[taskEvent.ID] = &taskEvent
-		m.WorkerTaskMap[sWorker] = append(m.WorkerTaskMap[sWorker], sTask.ID)
-		m.TaskWorkerMap[sTask.ID] = sWorker
+		log.Printf("Pulled %v off pending queue", taskEvent)
+
+		taskWorker, ok := m.TaskWorkerMap[sTask.ID]
+		if ok {
+			persistedTask := m.TaskDb[sTask.ID]
+			if taskEvent.State == task.Completed &&
+				task.ValidStateTransition(persistedTask.State, sTask.State) {
+				m.stopTask(taskWorker, sTask.ID.String())
+				return
+			}
+
+			log.Printf("invalid request: existing task %s is in state %v and cannot transition to the completed state\n",
+				persistedTask.ID.String(), persistedTask.State,
+			)
+			return
+		}
+
+		sWorker, err := m.SelectWorker(sTask)
+		if err != nil {
+			log.Printf("error selecting worker for task %s: %v\n", sTask.ID, err)
+		}
+
+		m.WorkerTaskMap[sWorker.Name] = append(m.WorkerTaskMap[sWorker.Name], sTask.ID)
+		m.TaskWorkerMap[sTask.ID] = sWorker.Name
 
 		sTask.State = task.Scheduled
 		m.TaskDb[sTask.ID] = &sTask
@@ -159,7 +228,7 @@ func (m *Manager) SendWork() {
 			return
 		}
 
-		url := fmt.Sprintf("http://%s/tasks", sWorker)
+		url := fmt.Sprintf("http://%s/tasks", sWorker.Name)
 
 		resp, err := http.Post(url, "application/json", bytes.NewBuffer(data))
 		if err != nil {

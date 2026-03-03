@@ -22,25 +22,63 @@ func main() {
 
 	fmt.Println("Starting Cube worker")
 
-	w := &worker.Worker{
+	w1 := &worker.Worker{
 		Queue: *queue.New(),
 		Db:    make(map[uuid.UUID]*task.Task),
 	}
 
-	wapi := worker.Api{
+	wapi1 := worker.Api{
 		Address: whost,
 		Port:    wport,
-		Worker:  w,
+		Worker:  w1,
 	}
 
-	go w.RunTask()
-	go w.CollectStats()
-	go w.UpdateTasks()
-	go wapi.StartServer()
+	w2 := &worker.Worker{
+		Queue: *queue.New(),
+		Db:    make(map[uuid.UUID]*task.Task),
+	}
+
+	wapi2 := worker.Api{
+		Address: whost,
+		Port:    mport + 1,
+		Worker:  w2,
+	}
+
+	w3 := &worker.Worker{
+		Queue: *queue.New(),
+		Db:    make(map[uuid.UUID]*task.Task),
+	}
+
+	wapi3 := worker.Api{
+		Address: whost,
+		Port:    mport + 2,
+		Worker:  w3,
+	}
+
+	go w1.RunTask()
+	go w1.CollectStats()
+	go w1.UpdateTasks()
+	go wapi1.StartServer()
 	time.Sleep(5 * time.Second)
 
-	workers := []string{fmt.Sprintf("%s:%d", whost, wport)}
-	m := manager.New(workers)
+	go w2.RunTask()
+	go w2.CollectStats()
+	go w2.UpdateTasks()
+	go wapi2.StartServer()
+	time.Sleep(5 * time.Second)
+
+	go w3.RunTask()
+	go w3.CollectStats()
+	go w3.UpdateTasks()
+	go wapi3.StartServer()
+	time.Sleep(5 * time.Second)
+
+	workers := []string{
+		fmt.Sprintf("%s:%d", whost, wport),
+		fmt.Sprintf("%s:%d", whost, mport+1),
+		fmt.Sprintf("%s:%d", whost, mport+2),
+	}
+	m := manager.New(workers, "evpm")
 	mapi := manager.Api{
 		Address: mhost,
 		Port:    mport,

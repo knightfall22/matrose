@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang-collections/collections/queue"
 	"github.com/google/uuid"
+	"github.com/knightfall22/matrose/stats"
 	"github.com/knightfall22/matrose/task"
 )
 
@@ -28,7 +29,7 @@ type Worker struct {
 	//Keeps tracks of all tracks in a worker
 	Db map[uuid.UUID]*task.Task
 
-	Stats *Stats
+	Stats *stats.Stats
 
 	TaskCount int
 }
@@ -40,7 +41,7 @@ func (w *Worker) AddTask(t task.Task) {
 func (w *Worker) CollectStats() {
 	for {
 		log.Println("Collecting Stats")
-		w.Stats = GetStats()
+		w.Stats = stats.GetStats()
 		w.Stats.TaskCount = w.TaskCount
 		time.Sleep(15 * time.Second)
 	}
