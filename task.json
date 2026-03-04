@@ -1,0 +1,17 @@
+{
+  "id": "e4c9dac2-0e89-4d32-918e-9fe33ccb86b1",
+  "state": 2,
+  "task": {
+    "state": 1,
+    "id": "f7a31e22-9cb9-4f71-938e-7dd7b70c55d9",
+    "name": "test-chapter-12",
+    "image": "timboring/echo-server:latest",
+    "exposed_ports": {
+      "7777/tcp": {}
+    },
+    "port_bindings": {
+      "7777/tcp": "7778"
+    },
+    "health_check": "/health"
+  }
+}

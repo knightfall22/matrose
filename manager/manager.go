@@ -61,8 +61,8 @@ func New(workers []string, schedulerType string, dbType string) (*Manager, error
 	switch schedulerType {
 	case "roundrobin":
 		s = &scheduler.RoundRobin{Name: "roundrobin"}
-	case "evpm":
-		s = &scheduler.Epvm{Name: "evpm"}
+	case "epvm":
+		s = &scheduler.Epvm{Name: "epvm"}
 	default:
 		s = &scheduler.RoundRobin{Name: "roundrobin"}
 	}

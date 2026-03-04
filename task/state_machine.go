@@ -1,6 +1,29 @@
 package task
 
-import "slices"
+import (
+	"fmt"
+	"slices"
+)
+
+type State int
+
+const (
+	Pending State = iota
+	Scheduled
+	Running
+	Completed
+	Failed
+)
+
+func (s State) String() string {
+	states := []string{"Pending", "Scheduled", "Running", "Completed", "Failed"}
+
+	if s < Pending || int(s) >= len(states) {
+		return fmt.Sprintf("unknown state(%d)", s)
+	}
+
+	return states[s]
+}
 
 var stateTransitionMap = map[State][]State{
 	Pending:   []State{Scheduled},

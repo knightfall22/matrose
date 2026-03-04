@@ -23,16 +23,6 @@ import (
 // - What the orchestrator should do in case of failures, typically called a restart policy
 // - The name of the container image used to run the task
 
-type State int
-
-const (
-	Pending State = iota
-	Scheduled
-	Running
-	Completed
-	Failed
-)
-
 type Task struct {
 	ID    uuid.UUID `json:"id"`
 	Name  string    `json:"name"`

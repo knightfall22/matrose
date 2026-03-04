@@ -105,13 +105,21 @@ func (w *Worker) runTask() task.DockerResult {
 
 	taskPersisted := *queuedTask.(*task.Task)
 
+	if taskPersisted.State == task.Completed {
+		return w.StopTask(taskPersisted)
+	}
+
 	var result task.DockerResult
 	if task.ValidStateTransition(taskPersisted.State, taskQueued.State) {
 		switch taskQueued.State {
 		case task.Scheduled:
+			if taskPersisted.ContainerID != "" {
+				result := w.StopTask(taskPersisted)
+				if result.Error != nil {
+					log.Printf("%v\n", result.Error)
+				}
+			}
 			result = w.StartTask(taskQueued)
-		case task.Completed:
-			result = w.StopTask(taskQueued)
 		default:
 			result.Error = errors.New("We should not get here")
 		}
@@ -232,7 +240,7 @@ func (w *Worker) UpdateTasks() {
 		log.Println("Checking status of tasks")
 		w.updateTasks()
 		log.Println("Task updates completed")
-		log.Println("Sleeping for 15 seconds")
-		time.Sleep(15 * time.Second)
+		log.Println("Sleeping for 10 seconds")
+		time.Sleep(10 * time.Second)
 	}
 }
