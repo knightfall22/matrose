@@ -7,7 +7,7 @@ Like most orchestrators Matrose uses a modular approach for layering separating 
 
 ## Architecture
 
-![Architecture](assets/architecture.png)
+![Architecture](assets/matrose.png)
 
 - **Manager:** Uses a single manager, a manager is responsible dispatching tasks to workers. Tasks are dispatched using 1 of two algorithms; Round Robin and EPVM. Manager keeps track of tasks, their states and tracks worker machines. Tasks are dispatched to the manager through it's API.
 
